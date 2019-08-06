@@ -36,21 +36,21 @@ static struct smb_params v1_params = {
 		.name	= "fast charge current",
 		.reg	= FAST_CHARGE_CURRENT_CFG_REG,
 		.min_u	= 0,
-		.max_u	= 3300000,
+		.max_u	= 4500000,
 		.step_u	= 25000,
 	},
 	.fv			= {
 		.name	= "float voltage",
 		.reg	= FLOAT_VOLTAGE_CFG_REG,
 		.min_u	= 3487500,
-		.max_u	= 4400000,
+		.max_u	= 4920000,
 		.step_u	= 7500,
 	},
 	.usb_icl		= {
 		.name	= "usb input current limit",
 		.reg	= USBIN_CURRENT_LIMIT_CFG_REG,
 		.min_u	= 0,
-		.max_u	= 3000000,
+		.max_u	= 4800000,
 		.step_u	= 25000,
 	},
 	.icl_stat		= {
@@ -530,6 +530,9 @@ static int smb2_usb_get_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_TYPE_RECHECK:
 		rc = smblib_get_prop_type_recheck(chg, val);
+		break;
+	case 145:
+		rc = -EINVAL;
 		break;
 	default:
 		pr_err("get prop %d is not supported in usb\n", psp);
@@ -1645,14 +1648,6 @@ static int smb2_init_hw(struct smb2 *chip)
 	if (rc < 0) {
 		dev_err(chg->dev,
 			"Couldn't configure QC2.0 to 9V rc=%d\n", rc);
-		return rc;
-	}
-	/* Operate the QC3.0 to limit vbus to 6.6v*/
-	rc = smblib_masked_write(chg, HVDCP_PULSE_COUNT_MAX_REG,
-						PULSE_COUNT_QC3P0_mask, 0x8);
-	if (rc < 0) {
-		dev_err(chg->dev,
-			"Couldn't configure QC3.0 to 6.6V rc=%d\n", rc);
 		return rc;
 	}
 
