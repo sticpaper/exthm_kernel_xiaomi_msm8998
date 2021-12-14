@@ -4,6 +4,7 @@
  * Written by Stephen C. Tweedie <sct@redhat.com>, 1998
  *
  * Copyright 1998 Red Hat corp --- All Rights Reserved
+ * Copyright (C) 2020 XiaoMi, Inc.
  *
  * This file is part of the Linux kernel and is made available under
  * the terms of the GNU General Public License, version 2, or at your
@@ -295,6 +296,10 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
 		if (jinode->i_next_transaction) {
 			jinode->i_transaction = jinode->i_next_transaction;
 			jinode->i_next_transaction = NULL;
+			jinode->i_dirty_start = jinode->i_next_dirty_start;
+			jinode->i_dirty_end = jinode->i_next_dirty_end;
+			jinode->i_next_dirty_start = 0;
+			jinode->i_next_dirty_end = 0;
 			list_add(&jinode->i_list,
 				&jinode->i_transaction->t_inode_list);
 		} else {
